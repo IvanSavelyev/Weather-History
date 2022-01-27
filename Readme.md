@@ -10,9 +10,7 @@ Table weather_history has two columns:
 • weather_date DATE
 • weather_value VARCHAR
 
-## Installing
 
-    git clone https://github.com/IvanSavelyev/Restaurant-Voting-System.git
 
 ## Run
 
