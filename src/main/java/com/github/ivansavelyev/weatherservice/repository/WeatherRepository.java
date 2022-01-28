@@ -14,4 +14,6 @@ public interface WeatherRepository extends CrudRepository<Weather, Integer> {
 
     @Transactional
     Weather save(Weather weather);
+
+    boolean existsByWeatherDate(LocalDate localDate);
 }

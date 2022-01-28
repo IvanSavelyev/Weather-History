@@ -8,6 +8,7 @@ import com.github.ivansavelyev.weatherservice.web.exeption.WeatherException;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,26 +28,24 @@ public class WeatherController {
     private final WeatherRepository weatherRepository;
 
     @GetMapping("/weather")
+    @Transactional
     public Weather get(@DateTimeFormat(pattern = TimeUtil.DATE_FORMAT_PATTERN)
                        @RequestParam(value = "localDate",
                                defaultValue = "#{T(java.time.LocalDate).now().toString()}") LocalDate localDate) {
-        Weather weather;
         LocalDate today = LocalDate.now();
         if (localDate.isAfter(today)) {
             throw new WeatherException("We are not in future");
         } else if (localDate.isBefore(today)) {
-            weather = weatherRepository.findByWeatherDate(localDate);
-            if (weather == null) {
+            if (!weatherRepository.existsByWeatherDate(localDate)) {
                 throw new WeatherException("No previous data");
             } else {
-                return weather;
+                return weatherRepository.findByWeatherDate(localDate);
             }
         } else {
-            weather = weatherRepository.findByWeatherDate(localDate);
-            if (weather == null) {
+            if (!weatherRepository.existsByWeatherDate(localDate)) {
                 return weatherRepository.save(new Weather(WebUtil.parseFromYandex()));
             } else {
-                return weather;
+                return weatherRepository.findByWeatherDate(localDate);
             }
         }
     }
